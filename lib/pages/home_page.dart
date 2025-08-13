@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:metro_app/pages/show_page.dart';
+import 'package:metro_app/widgets/address_text_field.dart';
 import 'package:metro_app/widgets/drop_down.dart';
 import 'package:metro_app/widgets/my_button.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
+
+  TextEditingController textEditingController = TextEditingController();
 
   List<String> cairoMetroLine1 = [
     "المرج",
@@ -103,16 +107,34 @@ class HomePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 25),
-          MyButton(text: 'عرض', color: Colors.red, widthButton: .75),
+          MyButton(
+            text: 'عرض',
+            color: Colors.red,
+            widthButton: .75,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ShowPage()),
+              );
+            },
+          ),
           const SizedBox(height: 8),
           MyButton(
             text: "أقرب محطة",
             widthButton: .25,
             color: Color(0xFFBCBCBC),
+            onTap: () {},
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+            child: AddressTextField(
+              textController: textEditingController,
+              label: 'أدخل العنوان المتجه اليه',
+            ),
           ),
         ],
       ),
     );
   }
 }
-
