@@ -38,7 +38,10 @@ class CustomDropDown extends StatelessWidget {
       dropdownColor: AppColors.card,
       style: const TextStyle(color: AppColors.text),
       iconEnabledColor: AppColors.text,
-      items: stations.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+      items:
+          stations
+              .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+              .toList(),
       onChanged: onChanged,
     );
   }

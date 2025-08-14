@@ -23,7 +23,14 @@ class ResultElement extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('$text $result', style: const TextStyle(color: AppColors.text, fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(
+              '$text $result',
+              style: const TextStyle(
+                color: AppColors.text,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             if (details != null) ...[
               const SizedBox(height: 6),
               Text(details!, style: const TextStyle(color: Colors.white70)),

@@ -1,6 +1,7 @@
-// show_view.dart
 import 'package:flutter/material.dart';
+import 'package:metro_app/core/utils/colors/app_colors.dart';
 import 'package:metro_app/features/planning/data/model/route_result.dart';
+import 'package:metro_app/features/planning/views/widgets/show_view_body.dart';
 
 class ShowView extends StatelessWidget {
   final RouteResult result;
@@ -9,58 +10,17 @@ class ShowView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text('تفاصيل الرحلة'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoRow('من:', result.start),
-            _buildInfoRow('إلى:', result.end),
-            _buildInfoRow('عدد المحطات:', '${result.stopsCount}'),
-            _buildInfoRow('الوقت المتوقع:', '${result.minutes} دقيقة'),
-            _buildInfoRow('سعر التذكرة:', '${result.ticketPrice} جنيه'),
-            const SizedBox(height: 24),
-            const Text(
-              'مسار الرحلة:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                itemCount: result.pathStations.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: CircleAvatar(child: Text('${index + 1}')),
-                    title: Text(
-                      result.pathStations[index],
-                      textAlign: TextAlign.right,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+        title: const Text(
+          'تفاصيل الرحلة',
+          style: TextStyle(fontFamily: 'Tajawal'), // استخدام خط عربي
         ),
+        centerTitle: true,
       ),
+      body: ShowViewBody(result: result)
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(width: 8),
-          Text(value),
-        ],
-      ),
-    );
-  }
+ 
 }

@@ -26,7 +26,13 @@ class CustomButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 3))],
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
         ),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
         child: Row(
@@ -39,7 +45,11 @@ class CustomButton extends StatelessWidget {
             Flexible(
               child: Text(
                 text,
-                style: const TextStyle(color: AppColors.text, fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
               ),

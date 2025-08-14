@@ -1,11 +1,11 @@
-// home_view_body.dart
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:metro_app/core/functions/metro_utils.dart';
 import 'package:metro_app/core/services/location_service.dart';
 import 'package:metro_app/core/services/maps_service.dart';
 import 'package:metro_app/core/utils/assets/app_assets.dart';
 import 'package:metro_app/core/utils/constants/app_constants.dart';
-import 'package:metro_app/core/utils/metro_utils.dart';
 import 'package:metro_app/features/planning/data/model/station.dart';
 import 'package:metro_app/features/planning/views/show_View.dart';
 import 'package:metro_app/features/planning/views/widgets/address_text_field.dart';
@@ -24,6 +24,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
   String? selectedEndStation;
   String? nearestStationName;
   final TextEditingController addressController = TextEditingController();
+  bool isSearchingAddress = false;
 
   @override
   void initState() {
@@ -68,6 +69,53 @@ class _HomeViewBodyState extends State<HomeViewBody> {
     }
 
     return nearestStation;
+  }
+
+  Future<void> _findNearestStationToAddress() async {
+    if (addressController.text.isEmpty) {
+      _showSnack('الرجاء إدخال عنوان للبحث');
+      return;
+    }
+
+    setState(() => isSearchingAddress = true);
+
+    try {
+      final locations = await locationFromAddress(addressController.text);
+
+      if (locations.isEmpty) {
+        _showSnack('لا يمكن العثور على العنوان المدخل');
+        return;
+      }
+
+      final location = locations.first;
+      final nearest = _findNearestStation(
+        Position(
+          latitude: location.latitude,
+          longitude: location.longitude,
+          timestamp: DateTime.now(),
+          accuracy: 0,
+          altitude: 0,
+          heading: 0,
+          speed: 0,
+          speedAccuracy: 0,
+          altitudeAccuracy: 0,
+          headingAccuracy: 0,
+        ),
+      );
+
+      if (nearest != null) {
+        setState(() {
+          selectedEndStation = nearest;
+        });
+        _showSnack('أقرب محطة مترو للعنوان المدخل: $nearest');
+      } else {
+        _showSnack('لا توجد محطة مترو قريبة من العنوان المدخل');
+      }
+    } catch (e) {
+      _showSnack('حدث خطأ أثناء البحث: ${e.toString()}');
+    } finally {
+      setState(() => isSearchingAddress = false);
+    }
   }
 
   Future<void> _openMapToNearest() async {
@@ -129,81 +177,103 @@ class _HomeViewBodyState extends State<HomeViewBody> {
       ),
     );
   }
-
+@override
+  void dispose() {
+    addressController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const SizedBox(height: 20),
-          Image.asset(AppAssets.logo, width: size.width * 0.3),
-          const SizedBox(height: 20),
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
-          Row(
+    return SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: EdgeInsets.only(
+          bottom: bottomPadding + 16,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, 
             children: [
-              Expanded(
-                child: CustomDropDown(
-                  label: 'محطة البداية',
-                  value: selectedStartStation,
-                  onChanged: (v) => setState(() => selectedStartStation = v),
-                ),
+              const SizedBox(height: 20),
+              Image.asset(AppAssets.logo, width: size.width * 0.3),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomDropDown(
+                      label: 'محطة البداية',
+                      value: selectedStartStation,
+                      onChanged:
+                          (v) => setState(() => selectedStartStation = v),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: _openMapToNearest,
+                    icon: const Icon(Icons.near_me,color: Colors.white,),
+                    tooltip: 'أقرب محطة',
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              IconButton(
-                onPressed: _openMapToNearest,
-                icon: const Icon(Icons.near_me),
-                tooltip: 'أقرب محطة',
+              const SizedBox(height: 16),
+              CustomDropDown(
+                label: 'محطة الوصول',
+                value: selectedEndStation,
+                onChanged: (v) => setState(() => selectedEndStation = v),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      color: Colors.blue,
+                      widthButton: 75,
+                      text: 'خريطة المسار',
+                      icon: Icons.map,
+                      onTap: _openMapBetweenStations,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomButton(
+                      widthButton: 75,
+                      color: Colors.blue,
+                      text: 'عرض التفاصيل',
+                      icon: Icons.directions,
+                      onTap: _showRouteResult,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              AddressTextField(
+                textController: addressController,
+                label: 'أدخل العنوان المطلوب الوصول إليه',
+              ),
+              const SizedBox(height: 8),
+              isSearchingAddress
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                    onPressed: _findNearestStationToAddress,
+                    child: const Text('ابحث عن أقرب محطة لهذا العنوان'),
+                  ),
+              const SizedBox(height: 8),
+              const Text(
+                'سيتم تحديد أقرب محطة مترو للعنوان المدخل تلقائياً',
+                textAlign: TextAlign.right,
+                style: TextStyle(color: Colors.grey),
+              ),
+              SizedBox(
+                height: bottomPadding > 0 ? bottomPadding : 16,
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          // End Station Dropdown
-          CustomDropDown(
-            label: 'محطة الوصول',
-            value: selectedEndStation,
-            onChanged: (v) => setState(() => selectedEndStation = v),
-          ),
-          const SizedBox(height: 24),
-          // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: CustomButton(
-                  color: Colors.blue,
-                  widthButton: 75,
-                  text: 'خريطة المسار',
-                  icon: Icons.map,
-                  onTap: _openMapBetweenStations,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: CustomButton(
-                  widthButton: 75,
-                  color: Colors.blue,
-                  text: 'عرض التفاصيل',
-                  icon: Icons.directions,
-                  onTap: _showRouteResult,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          // Optional Address Field
-          AddressTextField(
-            textController: addressController,
-            label: 'أدخل العنوان (اختياري)',
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'يمكنك إدخال عنوان لمعرفة أقرب محطة مترو إليه',
-            textAlign: TextAlign.right,
-            style: TextStyle(color: Colors.grey),
-          ),
-        ],
-      ),
-    );
+        ),
+      );
+    
   }
 }
