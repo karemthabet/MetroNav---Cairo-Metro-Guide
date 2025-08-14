@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:metro_app/core/utils/colors/app_colors.dart';
-import 'package:metro_app/features/planning/data/station_coordinates.dart';
+import 'package:metro_app/core/utils/constants/app_constants.dart';
 
 class CustomDropDown extends StatelessWidget {
-  final String label;                // عنوان الحقل
-  final String? value;               // القيمة المختارة حاليًا
-  final void Function(String?)? onChanged; // حدث عند تغيير الاختيار
+  final String label;
+  final String? value;
+  final void Function(String?)? onChanged;
 
   const CustomDropDown({
     super.key,
@@ -16,11 +16,8 @@ class CustomDropDown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 📌 جلب أسماء المحطات بدون تكرار
-    final stationsNames = stationsCoordinates
-        .map((station) => station.name)
-        .toSet()
-        .toList();
+    // ✅ شيل التكرارات لتجنب Assertion خط الدروبدوان
+    final stations = AppConstants.allStationsUnique();
 
     return DropdownButtonFormField<String>(
       value: value,
@@ -41,12 +38,7 @@ class CustomDropDown extends StatelessWidget {
       dropdownColor: AppColors.card,
       style: const TextStyle(color: AppColors.text),
       iconEnabledColor: AppColors.text,
-      items: stationsNames
-          .map((s) => DropdownMenuItem(
-                value: s,
-                child: Text(s, textAlign: TextAlign.right),
-              ))
-          .toList(),
+      items: stations.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
       onChanged: onChanged,
     );
   }
