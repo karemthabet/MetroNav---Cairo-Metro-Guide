@@ -25,6 +25,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
   String? nearestStationName;
   final TextEditingController addressController = TextEditingController();
   bool isSearchingAddress = false;
+  TravelMode selectedTravelMode = TravelMode.transit;
 
   @override
   void initState() {
@@ -41,12 +42,10 @@ class _HomeViewBodyState extends State<HomeViewBody> {
           nearestStationName = nearest;
           selectedStartStation = nearest;
         });
-        _showSnack('أقرب محطة: $nearest');
-      } else {
-        _showSnack('لا يمكن تحديد المحطة الأقرب حالياً');
+        _showSnack('تم تحديد أقرب محطة تلقائياً: $nearest');
       }
     } catch (e) {
-      _showSnack(e.toString());
+      _showSnack('تعذر تحديد الموقع: ${e.toString()}');
     }
   }
 
@@ -104,12 +103,8 @@ class _HomeViewBodyState extends State<HomeViewBody> {
       );
 
       if (nearest != null) {
-        setState(() {
-          selectedEndStation = nearest;
-        });
-        _showSnack('أقرب محطة مترو للعنوان المدخل: $nearest');
-      } else {
-        _showSnack('لا توجد محطة مترو قريبة من العنوان المدخل');
+        setState(() => selectedEndStation = nearest);
+        _showSnack('تم تحديد أقرب محطة: $nearest');
       }
     } catch (e) {
       _showSnack('حدث خطأ أثناء البحث: ${e.toString()}');
@@ -118,17 +113,17 @@ class _HomeViewBodyState extends State<HomeViewBody> {
     }
   }
 
-  Future<void> _openMapToNearest() async {
-    final station = nearestStationName ?? selectedStartStation;
+  Future<void> _openMapToSelectedStation() async {
+    final station = selectedStartStation;
     if (station == null) {
-      _showSnack('لم يتم تحديد محطة');
+      _showSnack('لم يتم تحديد محطة بداية');
       return;
     }
 
     try {
-      await MapsService.fromCurrentToStation(station);
+      await MapsService.fromCurrentToStation(station, mode: selectedTravelMode);
     } catch (e) {
-      _showSnack('تعذر فتح الخرائط: $e');
+      _showSnack('تعذر فتح الخرائط: ${e.toString()}');
     }
   }
 
@@ -142,9 +137,10 @@ class _HomeViewBodyState extends State<HomeViewBody> {
       await MapsService.stationToStation(
         selectedStartStation!,
         selectedEndStation!,
+        mode: selectedTravelMode,
       );
     } catch (e) {
-      _showSnack('تعذر فتح الخرائط: $e');
+      _showSnack('تعذر فتح الخرائط: ${e.toString()}');
     }
   }
 
@@ -158,6 +154,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
       selectedStartStation!,
       selectedEndStation!,
     );
+
     if (route == null) {
       _showSnack('لا يمكن حساب المسار بين المحطتين المحددتين');
       return;
@@ -177,103 +174,231 @@ class _HomeViewBodyState extends State<HomeViewBody> {
       ),
     );
   }
-@override
+
+  @override
   void dispose() {
     addressController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
 
     return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: EdgeInsets.only(
-          bottom: bottomPadding + 16,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, 
-            children: [
-              const SizedBox(height: 20),
-              Image.asset(AppAssets.logo, width: size.width * 0.3),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomDropDown(
-                      label: 'محطة البداية',
-                      value: selectedStartStation,
-                      onChanged:
-                          (v) => setState(() => selectedStartStation = v),
+      physics: const BouncingScrollPhysics(),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      padding: EdgeInsets.only(bottom: bottomPadding + 16),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 30),
+            Image.asset(AppAssets.logo, width: size.width * 0.4),
+            const SizedBox(height: 30),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomDropDown(
+                    label: 'محطة البداية',
+                    value: selectedStartStation,
+                    items:
+                        AppConstants.allStationsUnique().map((station) {
+                          return DropdownMenuItem(
+                            value: station,
+                            child: Text(
+                              station,
+                              textAlign: TextAlign.right,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                    onChanged: (v) => setState(() => selectedStartStation = v),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Colors.blue.shade600, Colors.blue.shade400],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: _openMapToNearest,
-                    icon: const Icon(Icons.near_me,color: Colors.white,),
-                    tooltip: 'أقرب محطة',
+                  child: IconButton(
+                    onPressed: _openMapToSelectedStation,
+                    icon: const Icon(Icons.near_me, color: Colors.white),
+                    tooltip: 'فتح الخريطة من موقعك الحالي إلى المحطة',
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              CustomDropDown(
-                label: 'محطة الوصول',
-                value: selectedEndStation,
-                onChanged: (v) => setState(() => selectedEndStation = v),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      color: Colors.blue,
-                      widthButton: 75,
-                      text: 'خريطة المسار',
-                      icon: Icons.map,
-                      onTap: _openMapBetweenStations,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            CustomDropDown(
+              label: 'محطة الوصول',
+              value: selectedEndStation,
+              items:
+                  AppConstants.allStationsUnique().map((station) {
+                    return DropdownMenuItem(
+                      value: station,
+                      child: Text(
+                        station,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+              onChanged: (v) => setState(() => selectedEndStation = v),
+            ),
+            const SizedBox(height: 20),
+            CustomDropDown<String>(
+              label: 'وسيلة التنقل',
+              value: _getTravelModeString(selectedTravelMode),
+              items: [
+                DropdownMenuItem(
+                  value: 'مشي',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [
+                      Text('مشي'),
+                      SizedBox(width: 8),
+                      Icon(
+                        Icons.directions_walk,
+                        size: 18,
+                        color: Colors.white70,
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'قيادة',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [
+                      Text('قيادة'),
+                      SizedBox(width: 8),
+                      Icon(
+                        Icons.directions_car,
+                        size: 18,
+                        color: Colors.white70,
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'مواصلات',
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [
+                      Text('مواصلات'),
+                      SizedBox(width: 8),
+                      Icon(
+                        Icons.directions_transit,
+                        size: 18,
+                        color: Colors.white70,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              onChanged:
+                  (mode) => setState(() {
+                    selectedTravelMode =
+                        mode == 'قيادة'
+                            ? TravelMode.driving
+                            : mode == 'مشي'
+                            ? TravelMode.walking
+                            : TravelMode.transit;
+                  }),
+            ),
+            const SizedBox(height: 30),
+
+            Row(
+              children: [
+                Expanded(
+                  child: CustomButton(
+                    widthButton: 75,
+                    color: Colors.blue.shade600,
+                    text: 'خريطة المسار',
+                    icon: Icons.map,
+                    onTap: _openMapBetweenStations,
+                  ),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: CustomButton(
+                    widthButton: 75,
+                    color: Colors.blue.shade600,
+                    text: 'عرض التفاصيل',
+                    icon: Icons.directions,
+                    onTap: _showRouteResult,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            AddressTextField(
+              textController: addressController,
+              label: 'أدخل العنوان المطلوب الوصول إليه',
+            ),
+            const SizedBox(height: 15),
+            isSearchingAddress
+                ? const CircularProgressIndicator(
+                  color: Colors.blue,
+                  strokeWidth: 2,
+                )
+                : Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blue.shade600, Colors.blue.shade400],
                     ),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomButton(
-                      widthButton: 75,
-                      color: Colors.blue,
-                      text: 'عرض التفاصيل',
-                      icon: Icons.directions,
-                      onTap: _showRouteResult,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              AddressTextField(
-                textController: addressController,
-                label: 'أدخل العنوان المطلوب الوصول إليه',
-              ),
-              const SizedBox(height: 8),
-              isSearchingAddress
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
+                  child: ElevatedButton(
                     onPressed: _findNearestStationToAddress,
-                    child: const Text('ابحث عن أقرب محطة لهذا العنوان'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      'ابحث عن أقرب محطة لهذا العنوان',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-              const SizedBox(height: 8),
-              const Text(
-                'سيتم تحديد أقرب محطة مترو للعنوان المدخل تلقائياً',
-                textAlign: TextAlign.right,
-                style: TextStyle(color: Colors.grey),
-              ),
-              SizedBox(
-                height: bottomPadding > 0 ? bottomPadding : 16,
-              ),
-            ],
-          ),
+                ),
+            const SizedBox(height: 15),
+            const Text(
+              'سيتم تحديد أقرب محطة مترو للعنوان المدخل تلقائياً',
+              textAlign: TextAlign.right,
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+            SizedBox(height: bottomPadding > 0 ? bottomPadding : 20),
+          ],
         ),
-      );
-    
+      ),
+    );
   }
+}
+
+String _getTravelModeString(TravelMode mode) {
+  return mode == TravelMode.walking
+      ? 'مشي'
+      : mode == TravelMode.driving
+      ? 'قيادة'
+      : 'مواصلات';
 }
