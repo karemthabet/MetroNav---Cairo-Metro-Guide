@@ -10,17 +10,17 @@ class ShowView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
+        foregroundColor: Colors.white,
+
+        backgroundColor: AppColors.card,
         title: const Text(
           'تفاصيل الرحلة',
-          style: TextStyle(fontFamily: 'Tajawal'), // استخدام خط عربي
+          style: TextStyle(fontFamily: 'Tajawal', color: Colors.white),
         ),
         centerTitle: true,
       ),
-      body: ShowViewBody(result: result)
+      body: ShowViewBody(result: result),
     );
   }
-
- 
 }

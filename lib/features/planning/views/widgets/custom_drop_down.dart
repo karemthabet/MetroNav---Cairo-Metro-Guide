@@ -30,7 +30,7 @@ class CustomDropDown<T> extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: AppColors.text.withValues(alpha: 2),
+              color: AppColors.textSecondary,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -85,7 +85,7 @@ class CustomDropDown<T> extends StatelessWidget {
             dropdownColor: AppColors.card,
             icon: const Icon(
               Icons.keyboard_arrow_down_rounded,
-              color: Colors.white,
+              color: AppColors.textSecondary,
               size: 24,
             ),
             style: TextStyle(
@@ -104,7 +104,7 @@ class CustomDropDown<T> extends StatelessWidget {
                     child: Text(
                       item.value.toString(),
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

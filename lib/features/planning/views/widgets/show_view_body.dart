@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:metro_app/core/utils/colors/app_colors.dart';
 import 'package:metro_app/features/planning/data/model/route_result.dart';
 import 'package:metro_app/features/planning/views/widgets/build_info_row.dart';
 
@@ -6,81 +7,109 @@ class ShowViewBody extends StatelessWidget {
   const ShowViewBody({super.key, required this.result});
   final RouteResult result;
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Colors.blue.shade50, Colors.white],
-          ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.backgroundColor.withValues(alpha: 0.9),
+            AppColors.backgroundColor.withValues(alpha: 0.9),
+          ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-          
-            Card(
-              elevation: 4,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Card(
+            elevation: 6,
+            color: AppColors.card,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+              side: BorderSide(
+                color: Colors.blue.shade800.withValues(alpha: 0.6),
+                width: 1,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                children: [
+                  buildInfoRow(' :محطة الانطلاق', result.start),
+                  const Divider(color: Colors.blueGrey, height: 25),
+                  buildInfoRow(' :محطة الوصول', result.end),
+                  const Divider(color: Colors.blueGrey, height: 25),
+                  buildInfoRow(' :عدد المحطات', '${result.stopsCount}'),
+                  const Divider(color: Colors.blueGrey, height: 25),
+                  buildInfoRow(' :الوقت المتوقع', '${result.minutes} دقيقة'),
+                  const Divider(color: Colors.blueGrey, height: 25),
+                  buildInfoRow(' :سعر التذكرة', '${result.ticketPrice} جنيه'),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 28),
+
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: Text(
+              ':مسار الرحلة',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade300,
+                fontFamily: 'Tajawal',
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          Expanded(
+            child: Card(
+              elevation: 6,
+              color: AppColors.card,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    buildInfoRow('محطة الانطلاق:', result.start),
-                    const Divider(height: 20),
-                    buildInfoRow('محطة الوصول:', result.end),
-                    const Divider(height: 20),
-                    buildInfoRow('عدد المحطات:', '${result.stopsCount}'),
-                    const Divider(height: 20),
-                    buildInfoRow('الوقت المتوقع:', '${result.minutes} دقيقة'),
-                    const Divider(height: 20),
-                    buildInfoRow('سعر التذكرة:', '${result.ticketPrice} جنيه'),
-                  ],
+                borderRadius: BorderRadius.circular(15),
+                side: BorderSide(
+                  color: Colors.blue.shade800.withValues(alpha: 0.6),
+
+                  width: 1,
                 ),
               ),
-            ),
-            
-            const SizedBox(height: 24),
-            
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                'مسار الرحلة:',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade800,
-                  fontFamily: 'Tajawal',
-                ),
-                textAlign: TextAlign.right,
-              ),
-            ),
-            
-            const SizedBox(height: 12),
-            
-            // قائمة المحطات
-            Expanded(
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
                 child: ListView.separated(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
                   itemCount: result.pathStations.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  separatorBuilder:
+                      (_, __) => Divider(
+                        color: Colors.blueGrey.withValues(alpha: .5),
+                        height: 1,
+                        indent: 70,
+                        endIndent: 20,
+                      ),
                   itemBuilder: (context, index) {
                     return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
                       leading: CircleAvatar(
-                        backgroundColor: Colors.blue.shade100,
+                        backgroundColor: Colors.blue.shade900.withValues(
+                          alpha: 0.8,
+                        ),
                         child: Text(
                           '${index + 1}',
-                          style: const TextStyle(color: Colors.blue),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       title: Text(
@@ -88,21 +117,23 @@ class ShowViewBody extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 16,
                           fontFamily: 'Tajawal',
+                          color: Colors.white,
                         ),
                         textAlign: TextAlign.right,
                       ),
                       trailing: Icon(
                         Icons.directions_transit,
-                        color: Colors.blue.shade600,
+                        color: Colors.blue.shade400,
+                        size: 28,
                       ),
                     );
                   },
                 ),
               ),
             ),
-          ],
-        ),
-      );
-   
+          ),
+        ],
+      ),
+    );
   }
 }

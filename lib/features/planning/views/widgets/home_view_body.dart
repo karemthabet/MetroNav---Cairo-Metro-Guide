@@ -5,6 +5,7 @@ import 'package:metro_app/core/functions/metro_utils.dart';
 import 'package:metro_app/core/services/location_service.dart';
 import 'package:metro_app/core/services/maps_service.dart';
 import 'package:metro_app/core/utils/assets/app_assets.dart';
+import 'package:metro_app/core/utils/colors/app_colors.dart';
 import 'package:metro_app/core/utils/constants/app_constants.dart';
 import 'package:metro_app/features/planning/data/model/station.dart';
 import 'package:metro_app/features/planning/views/show_View.dart';
@@ -213,7 +214,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                               textAlign: TextAlign.right,
                               style: const TextStyle(
                                 fontSize: 15,
-                                color: Colors.white70,
+                                color: AppColors.textSecondary,
                               ),
                             ),
                           );
@@ -250,7 +251,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                         textAlign: TextAlign.right,
                         style: const TextStyle(
                           fontSize: 15,
-                          color: Colors.white70,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     );
@@ -272,7 +273,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                       Icon(
                         Icons.directions_walk,
                         size: 18,
-                        color: Colors.white70,
+                        color: AppColors.textSecondary,
                       ),
                     ],
                   ),
@@ -287,7 +288,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                       Icon(
                         Icons.directions_car,
                         size: 18,
-                        color: Colors.white70,
+                        color: AppColors.textSecondary,
                       ),
                     ],
                   ),
@@ -302,7 +303,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                       Icon(
                         Icons.directions_transit,
                         size: 18,
-                        color: Colors.white70,
+                        color: AppColors.textSecondary,
                       ),
                     ],
                   ),
