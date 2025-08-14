@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:metro_app/pages/home_page.dart';
+import 'package:metro_app/core/functions/hide_status_bar.dart';
+import 'package:metro_app/metro_app.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
-    );
-  }
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  hideStatusBar();
+  runApp(const MetroApp());
 }
