@@ -30,7 +30,9 @@ It provides real-time route planning, station details, and location-based sugges
 
 ## 📹 Video Demo
 
-
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/79a247ad-928a-411e-bce1-f9187b0cc6eb" controls width="480" style="border-radius: 12px;"></video>
+</div>
 
 ---
 
