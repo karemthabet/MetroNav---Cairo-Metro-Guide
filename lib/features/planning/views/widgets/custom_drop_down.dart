@@ -29,7 +29,7 @@ class CustomDropDown<T> extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 8, right: 4),
           child: Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textSecondary,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -88,7 +88,7 @@ class CustomDropDown<T> extends StatelessWidget {
               color: AppColors.textSecondary,
               size: 24,
             ),
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.text,
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -103,7 +103,7 @@ class CustomDropDown<T> extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8),
                     child: Text(
                       item.value.toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.bold,
                       ),

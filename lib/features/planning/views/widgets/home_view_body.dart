@@ -26,7 +26,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
   String? nearestStationName;
   final TextEditingController addressController = TextEditingController();
   bool isSearchingAddress = false;
-  TravelMode selectedTravelMode = TravelMode.transit;
+  TravelMode selectedTravelMode = TravelMode.driving;
 
   @override
   void initState() {
@@ -108,7 +108,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
         _showSnack('تم تحديد أقرب محطة: $nearest');
       }
     } catch (e) {
-      _showSnack('حدث خطأ أثناء البحث: ${e.toString()}');
+      _showSnack('لا يمكن العثور على العنوان المدخل');
     } finally {
       setState(() => isSearchingAddress = false);
     }
@@ -262,12 +262,12 @@ class _HomeViewBodyState extends State<HomeViewBody> {
             CustomDropDown<String>(
               label: 'وسيلة التنقل',
               value: _getTravelModeString(selectedTravelMode),
-              items: [
+              items: const [
                 DropdownMenuItem(
                   value: 'مشي',
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: const [
+                    children: [
                       Text('مشي'),
                       SizedBox(width: 8),
                       Icon(
@@ -282,7 +282,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                   value: 'قيادة',
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: const [
+                    children: [
                       Text('قيادة'),
                       SizedBox(width: 8),
                       Icon(
@@ -297,7 +297,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                   value: 'مواصلات',
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: const [
+                    children: [
                       Text('مواصلات'),
                       SizedBox(width: 8),
                       Icon(
