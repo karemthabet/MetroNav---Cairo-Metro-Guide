@@ -20,6 +20,14 @@ It provides real-time route planning, station details, and location-based sugges
 
 ---
 
+## 📸 Screenshots  
+
+| Home Screen | Route Planner |
+|:-----------:|:-------------:|
+| ![](assets/683shots_so.png) | ![](assets/93shots_so.png) |
+
+---
+
 ## 🛠 Tech Stack
 
 - **Flutter** (MVVM Pattern)  
@@ -36,8 +44,6 @@ It provides real-time route planning, station details, and location-based sugges
 
 ---
 
-
-
 ## 🗺 Metro Map
 
 ![Metro Map](assets/maps.jpg)
@@ -50,24 +56,3 @@ It provides real-time route planning, station details, and location-based sugges
    ```bash
    git clone https://github.com/yourusername/metronav.git
    cd metronav
-````
-
-2. **Install dependencies**
-
-   ```bash
-   flutter pub get
-   ```
-3. **Run the app**
-
-   ```bash
-   flutter run
-   ```
-
----
-
-📌 Project Highlights
-
-* Designed with **MVVM Pattern** for scalability
-* Fully responsive UI optimized for **Arabic
-* Integrated with location-based services for real-time station suggestions
-* **Added value** by delivering reliable, high-quality features that enhance user experience
